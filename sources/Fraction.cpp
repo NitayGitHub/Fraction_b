@@ -20,13 +20,19 @@ Fraction floatToFraction(const float &num)
 // Constructors
 Fraction::Fraction(int numerator, int denominator)
 {
-    int gcd = GetGcd(numerator, denominator);
-    this->nume = numerator / gcd;
-    this->deno = denominator / gcd;
     if (denominator == 0)
     {
         throw invalid_argument("Denominator cannot be 0");
     }
+    if(numerator == 0){
+        this->nume = 0;
+        this->deno = 1;
+        return;
+    }
+    int gcd = GetGcd(numerator, denominator);
+    this->nume = numerator / gcd;
+    this->deno = denominator / gcd;
+    
 }
 
 Fraction::Fraction(float numerator)
@@ -165,6 +171,9 @@ Fraction operator*(const Fraction &frac, const float &num)
 
 Fraction Fraction::operator/(const Fraction &other) const
 {
+    if(other.nume == 0){
+        throw runtime_error("Cannot divide by 0");
+    }
     int new_nume = this->nume * other.deno;
     int new_deno = this->deno * other.nume;
     Fraction new_frac(new_nume, new_deno);
@@ -305,6 +314,14 @@ Fraction& Fraction::operator--(){
 // Stream Operators
 
 ostream& operator<<(ostream& ost, const Fraction& frac){
+    if (frac.deno < 0 && frac.nume > 0){
+        ost << frac.getNumerator()*-1 << "/" << abs(frac.getDenominator());
+        return ost;
+    }
+    if (frac.deno < 0 && frac.nume < 0){
+        ost << abs(frac.getNumerator()) << "/" << abs(frac.getDenominator());
+        return ost;
+    }
     ost << frac.getNumerator() << "/" << frac.getDenominator();
     return ost;
 }
@@ -313,7 +330,7 @@ istream& operator>>(istream& ist, Fraction& frac){
     int nume = 0, deno = 0;
     ist >> nume >> deno;
     if (deno == 0){
-        throw invalid_argument("Denominator cannot be zero or empty");
+        throw runtime_error("Denominator cannot be zero or empty");
     }
     frac.setNumerator(nume);
     frac.setDenominator(deno);
