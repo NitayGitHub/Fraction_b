@@ -1,8 +1,12 @@
 #include "Fraction.hpp"
 #include <stdexcept>
 #include <cmath>
+#include <limits>
 using namespace std;
 namespace ariel{
+
+int max_int = std::numeric_limits<int>::max();
+int min_int = std::numeric_limits<int>::min();
 
 Fraction floatToFraction(const float &num)
 {
@@ -17,6 +21,16 @@ Fraction floatToFraction(const float &num)
     return res;
 }
 
+int checkOverflow(int this_nume, int this_deno, int other_nume, int other_deno){
+    if((float)this_nume * (float)other_nume > max_int || (float)this_nume * (float)other_nume < min_int){
+        return 1;
+    }
+    if((float)this_deno * (float)other_deno > max_int || (float)this_deno * (float)other_deno < min_int){
+        return 1;
+    }
+    return 0;
+}
+
 // Constructors
 Fraction::Fraction(int numerator, int denominator)
 {
@@ -29,10 +43,19 @@ Fraction::Fraction(int numerator, int denominator)
         this->deno = 1;
         return;
     }
+    if(numerator == denominator){
+        this->nume = 1;
+        this->deno = 1;
+        return;
+    }
+    if (numerator > max_int / 2 || denominator > max_int / 2 || numerator < min_int / 2 || denominator < min_int / 2){
+        this->nume = numerator;
+        this->deno = denominator;
+        return;
+    }
     int gcd = GetGcd(numerator, denominator);
     this->nume = numerator / gcd;
     this->deno = denominator / gcd;
-    
 }
 
 Fraction::Fraction(float numerator)
@@ -43,6 +66,7 @@ Fraction::Fraction(float numerator)
 }
 
 Fraction::Fraction() : nume(1), deno(1) {}
+
 
 // Functions
 
@@ -77,6 +101,8 @@ void Fraction::SimplfyFraction()
     deno = deno / gcd;
 }
 
+// Getters and Setters
+
 int Fraction::getNumerator() const
 {
     return nume;
@@ -98,16 +124,11 @@ void Fraction::setDenominator(int denominator)
 }
 
 // Math Operators
-Fraction Fraction::operator=(const Fraction &other)
-{
-    nume = other.nume;
-    deno = other.deno;
-    this->SimplfyFraction();
-    return *this;
-}
-
 Fraction Fraction::operator+(const Fraction &other) const
 {
+    if(checkOverflow(this->nume, this->deno, other.nume, other.deno)){
+        throw overflow_error("Overflow error");
+    }
     int new_deno = GetLcm(other.deno, this->deno);
     int new_nume = this->nume * (new_deno / this->deno) + other.nume * (new_deno / other.deno);
     Fraction new_frac(new_nume, new_deno);
@@ -129,6 +150,9 @@ Fraction operator+(const Fraction &frac, const float &num)
 
 Fraction Fraction::operator-(const Fraction &other) const
 {
+    if(checkOverflow(this->nume, this->deno, other.nume, other.deno)){
+        throw overflow_error("Overflow error");
+    }
     int new_deno = GetLcm(other.deno, this->deno);
     int new_nume = this->nume * (new_deno / this->deno) - other.nume * (new_deno / other.deno);
     Fraction new_frac(new_nume, new_deno);
@@ -150,6 +174,9 @@ Fraction operator-(const Fraction &frac, const float &num)
 
 Fraction Fraction::operator*(const Fraction &other) const
 {
+    if(checkOverflow(this->nume, this->deno, other.nume, other.deno)){
+        throw overflow_error("Overflow error");
+    }
     int new_nume = this->nume * other.nume;
     int new_deno = this->deno * other.deno;
     Fraction new_frac(new_nume, new_deno);
@@ -173,6 +200,9 @@ Fraction Fraction::operator/(const Fraction &other) const
 {
     if(other.nume == 0){
         throw runtime_error("Cannot divide by 0");
+    }
+    if(checkOverflow(this->nume, this->deno, other.nume, other.deno)){
+        throw overflow_error("Overflow error");
     }
     int new_nume = this->nume * other.deno;
     int new_deno = this->deno * other.nume;

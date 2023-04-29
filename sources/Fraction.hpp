@@ -11,7 +11,6 @@ private:
     int nume; // numerator
     int GetGcd(int num1, int num2) const;
     int GetLcm(int num1, int num2, int calculatedGcd) const;
-    Fraction GetFractionFromFloat(const float &num) const;
 public:
     // constructors
     Fraction(int numerator, int denominator);
@@ -26,7 +25,6 @@ public:
     void setDenominator(int denominator);
 
     // math operators
-    Fraction operator=(const Fraction &other);
     Fraction operator+(const Fraction &other) const;
     friend Fraction operator+(const float &num, const Fraction &frac);
     friend Fraction operator+(const Fraction &frac, const float &num);
