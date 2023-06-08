@@ -1,10 +1,9 @@
 #include "doctest.h"
 #include "sources/Fraction.hpp"
 #include <iostream>
+#include <sstream>
 using namespace std;
 using namespace ariel;
-
-
 
 TEST_CASE("Initialize 0 in denominator") {
     CHECK_THROWS(Fraction(1,0));
@@ -25,11 +24,16 @@ TEST_CASE("Check boolean operators"){
 TEST_CASE("Check math operators"){
     Fraction half(1,2);
     Fraction f4(277, 40);
+    Fraction f5(277, 80);
 
     CHECK(half + 13.867 == 14.367);
+    CHECK(half + f4 == 7.425);
     CHECK(13.867 - half == 13.367);
+    CHECK(f4 - half == 6.425);
     CHECK(half * 13.85 == f4);
+    CHECK(half * f4 == f5);
     CHECK(13.85 / half == 27.7);
+    CHECK(f4 / half == 13.85);
 }
 
 TEST_CASE("Check boolean operators with floats and fractions"){
@@ -48,7 +52,7 @@ TEST_CASE("Check unary operators"){
 
     CHECK(++f1 == 1.5);
     CHECK(--f1 == 0.5);
-    CHECK(f1++ == 1.5);
-    CHECK(f1-- == 0.5);
+    CHECK(f1++ == 0.5);
+    CHECK(f1-- == 1.5);
 }
 
